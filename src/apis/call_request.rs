@@ -1,4 +1,4 @@
-use crate::models::general::llm::{Message, ChatCompletion};
+use crate::models::general::llm::{Message, ChatCompletion, APIResponse};
 
 use dotenv::dotenv;
 use reqwest::Client;
@@ -7,7 +7,7 @@ use std::env;
 use reqwest::header::{HeaderMap, HeaderValue};
 
 // Call Large Language Model (i.e. GPT-4)
-pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::error::Error + Send>>{
+pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::error::Error + Send>> {
   dotenv().ok();
 
   // Extract API key information
@@ -54,9 +54,20 @@ pub async fn call_gpt(messages: Vec<Message>) -> Result<String, Box<dyn std::err
   //   .unwrap();
   // dbg!(res_raw.text().await.unwrap());
 
+  // Extract API response
+  let res: APIResponse = client
+    .post(url)
+    .json(&chat_completion)
+    .send()
+    .await
+    .map_err(|e| -> Box<dyn std::error::Error + Send> {Box::new(e)})?
+    .json()
+    .await
+    .map_err(|e| -> Box<dyn std::error::Error + Send> {Box::new(e)})?;
 
-  
-  Ok(("some_string".to_string()));
+
+  // Send response
+  Ok(res.choices[0].message.content.clone())
 
 }
 
@@ -73,6 +84,15 @@ mod tests {
 
     let messages = vec!(message);
 
-    call_gpt(messages).await;
+    let res: Result<String, Box<dyn std::error::Error + Send>> = call_gpt(messages).await;
+    match res {
+      Ok(res_str) => {
+        dbg!(res_str);
+        assert!(true);
+      },
+      Err(_) => {
+        assert!(false);
+      }
+    }
   }
 }
