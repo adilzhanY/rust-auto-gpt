@@ -11,8 +11,8 @@ pub async fn call_gpt(messages: Vec<Message>) {
   dotenv().ok();
 
   // Extract API key information
-  let api_key: String = env::var("OPEN_API_KEY").expect("OPEN_AI_ORG not found in env");
-  let api_org: String = env::var("OPEN_API_ORG").expect("OPEN_AI_KEY not found in env");
+  let api_key: String = env::var("OPEN_AI_KEY").expect("OPEN_AI_KEY not found in env");
+  let api_org: String = env::var("OPEN_AI_ORG").expect("OPEN_AI_ORG not found in env");
 
   // Confirm endpoint
   let url: &str = "https://api.openai.com/v1/chat/completions";
@@ -28,7 +28,7 @@ pub async fn call_gpt(messages: Vec<Message>) {
   // Create Open AI org header
   headers.insert(
     "OpenAI-Organization",
-    HeaderValue::from_str(api_org.as_str).unwrap()
+    HeaderValue::from_str(api_org.as_str()).unwrap()
   );
 
   // Create client
@@ -47,7 +47,25 @@ pub async fn call_gpt(messages: Vec<Message>) {
     .post(url)
     .json(&chat_completion)
     .send()
-    .await?;
+    .await
+    .unwrap();
   dbg!(res_raw.text().await.unwrap());
 
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[tokio::test]
+  async fn tests_call_to_openai() {
+    let message = Message {
+      role: "user".to_string(),
+      content: "Hi there, this is a test. Give me a short response".to_string()
+    };
+
+    let messages = vec!(message);
+
+    call_gpt(messages).await;
+  }
 }
