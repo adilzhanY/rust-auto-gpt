@@ -3,6 +3,12 @@ use crate::helpers::command_line::PrintCommand;
 use crate::apis::call_request::call_gpt;
 use serde::de::DeserializeOwned;
 use reqwest::Client;
+use std::fs;
+
+
+const CODE_TEMPLATE_PATH: &str = "/home/qantr/vscode_projects/rust_autogpt_course/web_template/src/code_template.rs";
+const EXECUTE_MAIN_PATH: &str = "/home/qantr/vscode_projects/rust_autogpt_course/web_template/src/main.rs";
+const API_SCHEMA_PATH: &str = "/home/qantr/vscode_projects/rust_autogpt_course/auto_gippity/src/api_schema.json";
 
 
 
@@ -75,7 +81,22 @@ pub async fn check_status_code(client: &Client, url: &str) -> Result<u16, reqwes
   let response: reqwest::Response = client.get(url).send().await?;
   Ok(response.status().as_u16())
 }
+// Get Code Template
+pub fn read_code_template_contents() -> String {
+  let path: String = String::from(CODE_TEMPLATE_PATH);
+  fs::read_to_string(path).expect("Failed to read code template")
+}
 
+// Save new backend code
+pub fn save_backend_code(contents: &String) {
+  let path: String = String::from(EXECUTE_MAIN_PATH);
+  fs::write(path, contents).expect("Failed to write main.rs file");
+}
+// Save JSON API Endpoint Schema
+pub fn save_api_endpoints(api_endpoints: &String) {
+  let path: String = String::from(API_SCHEMA_PATH);
+  fs::write(path, api_endpoints).expect("Failed to write API Endpoints to file");
+}
 #[cfg(test)]
 mod tests {
   use super::*;
