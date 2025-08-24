@@ -120,7 +120,7 @@ mod tests {
       convert_user_input_to_goal
     ).await;
 
-    assert!(res.len() > 20)
+    assert!(res.len() > 20);
 
     dbg!(res);
   }
