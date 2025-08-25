@@ -22,7 +22,7 @@ pub struct ProjectScope {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct FactSheet {
-  pub prject_description: String,
+  pub project_description: String,
   pub project_scope: Option<ProjectScope>,
   pub external_urls: Option<Vec<String>>,
   pub backend_code: Option<String>,
